@@ -64,12 +64,11 @@ void q_free(queue_t *q)
 bool q_insert_head(queue_t *q, char *s)
 {
     if (!q || !s) {
-        printf("false");
         return false;
     } else {
         list_ele_t *newh;
         newh = malloc(sizeof(list_ele_t));
-        char *s_cpy = malloc(sizeof(s));
+        char *s_cpy = malloc(strlen(s) + 1);
         // int s_size = sizeof(s);
         /* What should you do if the q is NULL? */
         /* Don't forget to allocate space for the string and copy it */
@@ -108,11 +107,12 @@ bool q_insert_tail(queue_t *q, char *s)
     /* You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
     if (!q || !s) {
+        printf("it test\n");
         return false;
     } else {
         list_ele_t *newh;
         newh = malloc(sizeof(list_ele_t));
-        char *s_cpy = malloc(sizeof(s));
+        char *s_cpy = malloc(strlen(s) + 1);
         // int s_size = sizeof(s);
         if (newh && s_cpy) {
             // strncpy(s_cpy, s, s_size);
@@ -149,23 +149,30 @@ bool q_insert_tail(queue_t *q, char *s)
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* You need to fix up this code. */
-    if (q == NULL) {
+    if (!q) {
         return false;
-    } else if (q->head == NULL) {
+    } else if (!q->head) {
         return false;
     } else {
         /* You need to fix up this code. */
-        printf("bufsize if：%ld\n", bufsize);
-        if (sp)
-            strncpy(sp, q->head->value, bufsize);
-        list_ele_t *old_head = q->head;
+        /* How about freeing the list elements and the strings? */
+        /* Free queue structure */
+        if (sp) {
+            //*sp = *q->head->value;
+            strncpy(sp, q->head->value + '\0', bufsize);
+        }
+        list_ele_t *to_be_free = q->head;
         q->head = q->head->next;
-        free(old_head->value);
-        free(old_head);
+        if (q->size == 1 && !q->head) {
+            q->tail = NULL;
+        }
+        free(to_be_free->value);
+        free(to_be_free);
         q->size -= 1;
         return true;
     }
 }
+
 
 /*
   Return number of elements in queue.
@@ -191,12 +198,10 @@ int q_size(queue_t *q)
 void q_reverse(queue_t *q)
 {
     /* You need to write the code for this function */
-
-    if (q && q->head) {
+    if (q && q->size > 1) {
         q->tail = q->head;
         list_ele_t *pre_node = NULL;
         list_ele_t *next_node = q->head->next;
-
         while (next_node) {
             q->head->next = pre_node;
             pre_node = q->head;
