@@ -35,9 +35,18 @@ queue_t *q_new()
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    /* How about freeing the list elements and the strings? */
-    /* Free queue structure */
-    free(q);
+    if (q != NULL) {
+        /* How about freeing the list elements and the strings? */
+        /* Free queue structure */
+        list_ele_t *to_be_free = q->head;
+        while (to_be_free) {
+            q->head = q->head->next;
+            free(to_be_free->value);
+            free(to_be_free);
+            to_be_free = q->head;
+        }
+        free(q);
+    }
 }
 
 /*
@@ -50,6 +59,7 @@ void q_free(queue_t *q)
 bool q_insert_head(queue_t *q, char *s)
 {
     if (q == NULL || s == NULL) {
+        printf("false");
         return false;
     } else {
         list_ele_t *newh;
@@ -60,9 +70,11 @@ bool q_insert_head(queue_t *q, char *s)
         char *s_cpy = malloc(s_len);
         /* Don't forget to allocate space for the string and copy it */
         /* What if either call to malloc returns NULL? */
-        if (newh == NULL || s_cpy == NULL) {
-            free(newh);
+        if (newh == NULL && s_cpy) {
             free(s_cpy);
+            return false;
+        } else if (s_cpy == NULL && newh) {
+            free(newh);
             return false;
         } else {
             strncpy(s_cpy, s, s_len);
@@ -130,17 +142,24 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* You need to fix up this code. */
     if (q == NULL) {
-        return 0;
+        return false;
+    } else if (q->head == NULL) {
+        return false;
     } else {
         /* You need to fix up this code. */
         list_ele_t *old_head = q->head;
+        /*
         if (sizeof(old_head)) {
             int str_len = sizeof(old_head->value);
             strncpy(sp, old_head->value, str_len);
-        }
+        }*/
+        int str_len = sizeof(old_head);
+        strncpy(sp, old_head->value, str_len);
         q->head = q->head->next;
         free(old_head->value);
+        old_head->value = NULL;
         free(old_head);
+        old_head = NULL;
         q->size -= 1;
         return true;
     }
