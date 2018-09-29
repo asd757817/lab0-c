@@ -107,7 +107,6 @@ bool q_insert_tail(queue_t *q, char *s)
     /* You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
     if (!q || !s) {
-        printf("it test\n");
         return false;
     } else {
         list_ele_t *newh;
@@ -158,8 +157,9 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
         /* How about freeing the list elements and the strings? */
         /* Free queue structure */
         if (sp) {
-            //*sp = *q->head->value;
-            strncpy(sp, q->head->value + '\0', bufsize);
+            memset(sp, '\0', bufsize);
+            strncpy(sp, q->head->value + '\0', bufsize - 1);
+            printf("%s\n", sp);
         }
         list_ele_t *to_be_free = q->head;
         q->head = q->head->next;
