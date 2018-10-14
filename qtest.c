@@ -457,6 +457,39 @@ static bool show_queue(int vlevel)
             qcnt);
         ok = false;
     }
+    ok = true;
+    cnt = 0;
+    report_noreturn(vlevel, "reverse_q = [");
+    list_ele_t *re = q->tail;
+    if (exception_setup(true)) {
+        while (ok && re && cnt < qcnt) {
+            if (cnt < big_queue_size)
+                report_noreturn(vlevel, cnt == 0 ? "%s" : " %s", re->value);
+            re = re->prev;
+            cnt++;
+            ok = ok && !error_check();
+        }
+    }
+    exception_cancel();
+    if (!ok) {
+        report(vlevel, " ... ]");
+        return false;
+    }
+    if (e == NULL) {
+        if (cnt <= big_queue_size)
+            report(vlevel, "]");
+        else
+            report(vlevel, " ... ]");
+    } else {
+        report(vlevel, " ... ]");
+        report(
+            vlevel,
+            "ERROR:  Either list has cycle, or queue has more than %d elements",
+            qcnt);
+        ok = false;
+    }
+
+
     return ok;
 }
 
