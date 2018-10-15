@@ -250,6 +250,7 @@ bool do_insert_tail(int argc, char *argv[])
     }
     exception_cancel();
     show_queue(3);
+    show_queue_reverse(3);
     return ok;
 }
 

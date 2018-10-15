@@ -114,9 +114,7 @@ bool q_insert_tail(queue_t *q, char *s)
         list_ele_t *newh;
         newh = malloc(sizeof(list_ele_t));
         char *s_cpy = malloc(strlen(s) + 1);
-        // int s_size = sizeof(s);
         if (newh && s_cpy) {
-            // strncpy(s_cpy, s, s_size);
             s_cpy = strcpy(s_cpy, s);
             newh->next = NULL;
             newh->value = s_cpy;
