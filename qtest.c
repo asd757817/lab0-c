@@ -52,6 +52,7 @@ int string_length = MAXSTRING;
 
 /****** Forward declarations ******/
 static bool show_queue(int vlevel);
+static bool show_queue_reverse(int vlevel);
 bool do_new(int argc, char *argv[]);
 bool do_free(int argc, char *argv[]);
 bool do_insert_head(int argc, char *argv[]);
@@ -109,6 +110,7 @@ bool do_new(int argc, char *argv[])
     exception_cancel();
     qcnt = 0;
     show_queue(3);
+    show_queue_reverse(3);
     return ok && !error_check();
 }
 
@@ -199,6 +201,7 @@ bool do_insert_head(int argc, char *argv[])
     }
     exception_cancel();
     show_queue(3);
+    show_queue_reverse(3);
     return ok;
 }
 
@@ -457,15 +460,26 @@ static bool show_queue(int vlevel)
             qcnt);
         ok = false;
     }
-    ok = true;
-    cnt = 0;
-    report_noreturn(vlevel, "reverse_q = [");
-    list_ele_t *re = q->tail;
+    return ok;
+}
+static bool show_queue_reverse(int vlevel)
+{
+    bool ok = true;
+    if (verblevel < vlevel)
+        return true;
+    int cnt = 0;
+    if (q == NULL) {
+        report(vlevel, "q = NULL");
+        return true;
+    }
+    report_noreturn(vlevel, "q = [");
+    // list_ele_t *e = q->head;
+    list_ele_t *e = q->tail;
     if (exception_setup(true)) {
-        while (ok && re && cnt < qcnt) {
+        while (ok && e && cnt < qcnt) {
             if (cnt < big_queue_size)
-                report_noreturn(vlevel, cnt == 0 ? "%s" : " %s", re->value);
-            re = re->prev;
+                report_noreturn(vlevel, cnt == 0 ? "%s" : " %s", e->value);
+            e = e->prev;
             cnt++;
             ok = ok && !error_check();
         }
@@ -488,10 +502,9 @@ static bool show_queue(int vlevel)
             qcnt);
         ok = false;
     }
-
-
     return ok;
 }
+
 
 bool do_show(int argc, char *argv[])
 {
